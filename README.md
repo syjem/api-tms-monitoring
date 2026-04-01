@@ -29,8 +29,8 @@ The API exposes a single endpoint:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/syjem/plsi-tms-monitoring-server.git
-   cd plsi-tms-monitoring-server
+   git clone https://github.com/syjem/api-tms-monitoring.git
+   cd api-tms-monitoring-server
    ```
 
 2. Create and activate a virtual environment:
