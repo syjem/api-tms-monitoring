@@ -22,35 +22,29 @@ class Extract(Resource):
         if not file.filename:
             return {"error": "Empty filename"}, 400
 
-        # Validate file type
         if not file.filename.lower().endswith(".pdf"):
             return {"error": "Invalid file type, expected PDF"}, 400
 
         try:
-            # Read file content
             part = types.Part.from_bytes(
                 data=file.read(),
                 mime_type="application/pdf"
             )
 
-            # Call Gemini model with prompt and file
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[part, PROMPT]
+                model="gemini-2.5-flash-lite",
+                contents=[part, PROMPT],
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
+                    response_mime_type="application/json",
+                ),
             )
-
-            # Extract and clean model output
-            raw_text = response.text
-            cleaned_text = re.sub(r"^```json|```$", "",
-                                  raw_text, flags=re.MULTILINE).strip()
 
             # Parse JSON safely
             try:
-                data = json.loads(cleaned_text)
+                data = json.loads(response.text)
             except json.JSONDecodeError:
-                return {
-                    "error": "Invalid JSON from Gemini",
-                }, 500
+                return {"error": "Invalid JSON from Gemini"}, 500
 
             # Validate expected JSON structure
             required_keys = {"from", "to", "logs"}
@@ -60,20 +54,17 @@ class Extract(Resource):
             if "error" in data and data.get("error") == "Invalid document format":
                 return {"error": "Invalid document format"}, 400
 
-            # Return successful JSON response
             return jsonify(data)
 
         except ClientError as e:
             if e.code == 429:
                 return {"error": "Rate limit exceeded. Please try again later."}, 429
-            else:
-                return {"error": f"Gemini client error: {e.code}: {e.message}"}, e.code
+            return {"error": f"Gemini client error: {e.code}: {e.message}"}, e.code
 
         except ServerError as e:
             if e.code == 503:
                 return {"error": "Gemini is currently overloaded. Please try again later."}, 503
-            else:
-                return {"error": f"Gemini server error: {e.code} - {e.message}"}, e.code
+            return {"error": f"Gemini server error: {e.code} - {e.message}"}, e.code
 
         except Exception as e:
             return {"error": str(e)}, 500
