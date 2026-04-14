@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import base64
 
@@ -13,13 +14,17 @@ class ClaudeProvider(BaseProvider):
         self.client = anthropic.Anthropic(
             api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+    def _parse_json(self, raw: str) -> dict:
+        cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
+        return json.loads(cleaned)
+
     def extract(self, file_bytes: bytes) -> dict:
         try:
             pdf_data = base64.standard_b64encode(file_bytes).decode("utf-8")
 
             response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=1024,
+                model="claude-haiku-4-5-20251001",
+                max_tokens=4096,
                 messages=[
                     {
                         "role": "user",
@@ -41,7 +46,7 @@ class ClaudeProvider(BaseProvider):
                 ],
             )
 
-            return json.loads(response.content[0].text)
+            return self._parse_json(response.content[0].text)
 
         except json.JSONDecodeError:
             raise ValueError("Invalid JSON from Claude")
