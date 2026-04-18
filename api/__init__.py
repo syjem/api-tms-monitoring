@@ -47,25 +47,15 @@ html_template = """
                     padding: 0.2rem 0.4rem;
                     border-radius: 4px;
                 }
-                code.get {
-                    color: black;
-                    background: oklch(97.9% 0.021 166.113);
-                }
-
                 code.post {
                     color: black;
                     background: oklch(97.1% 0.013 17.38);
                 }
-
                 strong {
                     font-size: 12px;
                     font-weight: 700;
                     padding: 0.3rem 1rem;
                     border-radius: 4px;
-                }
-                strong.get {
-                    color: green;
-                    background: oklch(84.5% 0.143 164.978);
                 }
                 strong.post {
                     color: red;
@@ -75,11 +65,7 @@ html_template = """
         </head>
         <body>
             <main>
-                <h1>The API exposes two endpoints: </h1>
-                <div class="container">
-                    <strong class="get">GET</strong>
-                    <code class="get">/api/health</code>
-                </div>
+                <h1>The API exposes a single endpoint:</h1>
                 <div class="container">
                     <strong class="post">POST</strong>
                     <code class="post">/api/extract</code>
