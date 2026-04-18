@@ -1,6 +1,6 @@
 # Flask PDF Extraction API
 
-A lightweight **Flask REST API** that uses **Gemini & Anthropic API** to extract structured data from PDF files.
+A lightweight **Flask REST API** that uses **Gemini & Anthropic** to extract structured data from PDF files.
 
 The API exposes a single endpoint:  
 `POST /api/extract`
